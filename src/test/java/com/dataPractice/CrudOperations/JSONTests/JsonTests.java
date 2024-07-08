@@ -5,7 +5,7 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.autoconfigure.json.JsonTest;
 import org.springframework.boot.test.json.JacksonTester;
 
-import com.dataPractice.CrudOperations.Entities.User;
+import com.dataPractice.CrudOperations.Entities.People;
 import com.jayway.jsonpath.DocumentContext;
 import com.jayway.jsonpath.JsonPath;
 
@@ -17,11 +17,11 @@ import java.io.IOException;
 public class JsonTests {
 
     @Autowired
-    private JacksonTester<User> json;
+    private JacksonTester<People> json;
 
     @Test
     void userJsonSerializationTest() throws IOException{
-        User user = new User(1L, "Benjamin", "Triggiani", 27, "biking, running, gaming, watching tv, studying");
+        People user = new People(1L, "Benjamin", "Triggiani", 27, "biking, running, gaming, watching tv, studying");
         assertThat(json.write(user)).isStrictlyEqualToJson("/resources/expected.json");
         assertThat(json.write(user)).hasJsonPathNumberValue("@.userId");
         assertThat(json.write(user)).extractingJsonPathNumberValue("@.userId").isEqualTo(1);
@@ -46,6 +46,6 @@ public class JsonTests {
                     "hobbies": "biking, running, gaming, watching tv, studying"
                 }""";
 
-        assertThat(json.parse(expected)).isEqualTo(new User(1L, "Benjamin", "Triggiani", 27, "biking, running, gaming, watching tv, studying"));
+        assertThat(json.parse(expected)).isEqualTo(new People(1L, "Benjamin", "Triggiani", 27, "biking, running, gaming, watching tv, studying"));
     }
 }

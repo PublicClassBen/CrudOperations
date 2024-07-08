@@ -11,7 +11,7 @@ import org.springframework.jdbc.support.KeyHolder;
 import org.springframework.stereotype.Repository;
 import org.springframework.transaction.annotation.Transactional;
 
-import com.dataPractice.CrudOperations.Entities.User;
+import com.dataPractice.CrudOperations.Entities.People;
 /**
  *  Respositiory componment for persistantly managing users within the user_with_hobbies table.
  * 
@@ -22,7 +22,7 @@ import com.dataPractice.CrudOperations.Entities.User;
  * |      1 | Benjamin  | Triggiani |   27 | biking, running, gaming, watching tv, studying |
  * +--------+-----------+-----------+------+------------------------------------------------+
  * 
- * Sample users table:
+ * Sample people table:
  * +---------+------------+-----------+------+
  * | user_id | first_name | last_name | age  |
  * +---------+------------+-----------+------+
@@ -81,16 +81,16 @@ public class UserRepository {
      * @param id the ID of the user
      * @return an optional user, is not empty when user has been found
      */
-    public Optional<User> getUserById(Long id){
+    public Optional<People> getUserById(Long id){
         //created view in database for easy execution
         String sql = """
-                SELECT userId, firstName, lastName, age, hobbies
+                SELECT user_Id, firstName, lastName, age, hobbies
                 FROM user_with_hobbies
-                WHERE userId = ?
+                WHERE user_Id = ?
                 """;
         try{
-        User user = jdbcTemplate.queryForObject(sql, (rs, row) -> {
-            return new User(rs.getLong(1), rs.getString(2), rs.getString(3), rs.getInt(4), rs.getString(5));
+        People user = jdbcTemplate.queryForObject(sql, (rs, row) -> {
+            return new People(rs.getLong(1), rs.getString(2), rs.getString(3), rs.getInt(4), rs.getString(5));
         }, id);
         return Optional.of(user);
         }catch(EmptyResultDataAccessException e){
@@ -104,10 +104,10 @@ public class UserRepository {
      * @param user the user to be created. Expects database to create and return user ID. User id should be null.
      * @return the ID of the created user
      */
-    public Long createUser(User user){
+    public Long createUser(People user){
         try{
             String insertUserSql = """
-                INSERT INTO users(first_name, last_name, age)
+                INSERT INTO people(first_name, last_name, age)
                 VALUES(?, ?, ?);
                 """;            
             KeyHolder userKeyHolder = new GeneratedKeyHolder();
@@ -150,10 +150,10 @@ public class UserRepository {
      * @param user the user to be created. Should have user ID
      * @return the ID of the created user
      */
-    public Long createUserIdOverride(User user){
+    public Long createUserIdOverride(People user){
         try{
             String insertUserSql = """
-                INSERT INTO users(user_id, first_name, last_name, age)
+                INSERT INTO people(user_id, first_name, last_name, age)
                 VALUES(?, ?, ?, ?);
                 """;         
             KeyHolder userKeyHolder = new GeneratedKeyHolder();
@@ -200,7 +200,7 @@ public class UserRepository {
     @Transactional
     public int removeUserWithId(Long id){
         String userSql = """
-                DELETE FROM users 
+                DELETE FROM people 
                 WHERE user_id = ?;
                 """;
         
@@ -216,7 +216,7 @@ public class UserRepository {
      * 
      * @param user the user to be updated
      */
-    public void updateUser(User user){
+    public void updateUser(People user){
 
         removeUserWithId(user.userId());
 

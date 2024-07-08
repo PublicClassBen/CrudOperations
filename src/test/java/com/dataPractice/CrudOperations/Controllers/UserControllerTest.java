@@ -9,7 +9,7 @@ import org.springframework.http.HttpMethod;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 
-import com.dataPractice.CrudOperations.Entities.User;
+import com.dataPractice.CrudOperations.Entities.People;
 import com.jayway.jsonpath.DocumentContext;
 import com.jayway.jsonpath.JsonPath;
 
@@ -55,7 +55,7 @@ public class UserControllerTest {
 
     @Test
     void shouldAddUserAndAllHobbies(){
-        User user = new User(null, "Thomas", "Triggiani", 25, "anime, gaming, legos");
+        People user = new People(null, "Thomas", "Triggiani", 25, "anime, gaming, legos");
         ResponseEntity<Void> response = restTemplate.postForEntity("/user", user, Void.class);
         
         assertThat(response.getStatusCode()).isEqualTo(HttpStatus.NO_CONTENT);
@@ -66,7 +66,7 @@ public class UserControllerTest {
 
     @Test
     void shouldDeleteAUser(){
-        User user = new User(null, "Thomas", "Triggiani", 25, "anime, gaming, legos");
+        People user = new People(null, "Thomas", "Triggiani", 25, "anime, gaming, legos");
         ResponseEntity<Void> response = restTemplate.postForEntity("/user", user, Void.class);
 
         ResponseEntity<Void> deleteResponse = restTemplate.exchange(response.getHeaders().getLocation(), HttpMethod.DELETE, null, Void.class);
@@ -81,8 +81,8 @@ public class UserControllerTest {
 
     @Test
     void shouldUpdateExistingUser(){
-        User user = new User(1L, "Benjamin", "Triggiani", 28, "biking, running, gaming, watching tv, studying");
-        HttpEntity<User> httpEntity = new HttpEntity<>(user);
+        People user = new People(1L, "Benjamin", "Triggiani", 28, "biking, running, gaming, watching tv, studying");
+        HttpEntity<People> httpEntity = new HttpEntity<>(user);
         ResponseEntity<Void> response = restTemplate.exchange("/user", HttpMethod.PUT, httpEntity,Void.class);
 
         assertThat(response.getStatusCode()).isEqualTo(HttpStatus.NO_CONTENT);
@@ -95,7 +95,7 @@ public class UserControllerTest {
         Number age = dc.read("$.age");
         assertThat(age).isEqualTo(28);
 
-        user = new User(1L, "Benjamin", "Triggiani", 27, "biking, running, gaming, watching tv, studying");
+        user = new People(1L, "Benjamin", "Triggiani", 27, "biking, running, gaming, watching tv, studying");
         httpEntity = new HttpEntity<>(user);
         response = restTemplate.exchange("/user", HttpMethod.PUT, httpEntity,Void.class);
 

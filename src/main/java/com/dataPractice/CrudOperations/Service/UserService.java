@@ -4,7 +4,7 @@ import java.util.Optional;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
-import com.dataPractice.CrudOperations.Entities.User;
+import com.dataPractice.CrudOperations.Entities.People;
 import com.dataPractice.CrudOperations.Repository.UserRepository;
 /**
  * Service component for managing Users.
@@ -30,8 +30,8 @@ public class UserService {
      * @param id the ID of the user requested
      * @return the User from the database
      */
-    public User getUserById(Long id){
-        Optional<User> oUser = userRepository.getUserById(id);
+    public People getUserById(Long id){
+        Optional<People> oUser = userRepository.getUserById(id);
 
         return oUser.isPresent()? oUser.get(): null;
     }
@@ -43,7 +43,7 @@ public class UserService {
      * @return the ID of the created user
      */
     @Transactional
-    public long createUser(User user){
+    public long createUser(People user){
         return userRepository.createUser(user);
     }
 
@@ -65,7 +65,7 @@ public class UserService {
      * @param user the new user content to be updated
      */
     @Transactional
-    public void updateUser(User user){
+    public void updateUser(People user){
         userRepository.updateUser(user);
     }
 

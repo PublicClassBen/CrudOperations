@@ -4,7 +4,7 @@ import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.RestController;
 import org.springframework.web.util.UriComponentsBuilder;
-import com.dataPractice.CrudOperations.Entities.User;
+import com.dataPractice.CrudOperations.Entities.People;
 import com.dataPractice.CrudOperations.Service.UserService;
 import java.net.URI;
 import org.springframework.http.HttpHeaders;
@@ -42,8 +42,8 @@ public class UserController {
      * @return A responseEntity if the user is found with a status code of 200 ok. If not found, a responseEntity containing a status code of 404
      */
     @GetMapping()
-    private ResponseEntity<User> getUserById(@RequestParam Long userId){
-        User user = userService.getUserById(userId);
+    private ResponseEntity<People> getUserById(@RequestParam Long userId){
+        People user = userService.getUserById(userId);
         
         if(user != null)
             return ResponseEntity.ok(user);
@@ -58,7 +58,7 @@ public class UserController {
      * @return a responseEnity with a 201 created code. Throws  500 internal server error code if fails.
      */
     @PostMapping()
-    public ResponseEntity<Void> createUser(@RequestBody User user){
+    public ResponseEntity<Void> createUser(@RequestBody People user){
         Long id = userService.createUser(user);
         URI uri = UriComponentsBuilder
         .fromPath("/user")
@@ -92,7 +92,7 @@ public class UserController {
      * @return a status code of 201 created if successful, 500 internal server error code if failed.
      */
     @PutMapping()
-    private ResponseEntity<Void> updateUser(@RequestBody User user){
+    private ResponseEntity<Void> updateUser(@RequestBody People user){
 
         userService.updateUser(user);
         return ResponseEntity.noContent().build();

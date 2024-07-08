@@ -7,6 +7,7 @@ import org.springframework.context.annotation.Configuration;
 import org.springframework.jdbc.core.JdbcTemplate;
 import org.springframework.jdbc.datasource.DataSourceTransactionManager;
 import org.springframework.transaction.PlatformTransactionManager;
+import org.springframework.transaction.annotation.EnableTransactionManagement;
 
 /**
  * Configuration class to create needed beans for the user components
@@ -14,6 +15,7 @@ import org.springframework.transaction.PlatformTransactionManager;
  * @author Benjamin Triggiani
  */
 @Configuration
+@EnableTransactionManagement
 public class RepositoryConfig {
 
     @Bean
