@@ -1,4 +1,4 @@
-package com.dataPractice.CrudOperations.Repository;
+package com.dataPractice.CrudOperations.Repositories;
 
 import java.sql.PreparedStatement;
 import java.sql.Statement;
@@ -16,18 +16,18 @@ import com.dataPractice.CrudOperations.Entities.People;
  *  Respositiory componment for persistantly managing users within the user_with_hobbies table.
  * 
  * Sample user_with_hobbies view:
- * +--------+-----------+-----------+------+------------------------------------------------+
- * | userId | firstName | lastName  | age  | hobbies                                        |
- * +--------+-----------+-----------+------+------------------------------------------------+
- * |      1 | Benjamin  | Triggiani |   27 | biking, running, gaming, watching tv, studying |
- * +--------+-----------+-----------+------+------------------------------------------------+
+ * +---------+-----------+-----------+------+------------+------------------------------------------------+
+ * | user_id | FirstName | LastName  | Age  | Owner      | hobbies                                        |
+ * +---------+-----------+-----------+------+------------+------------------------------------------------+
+ * |       1 | Benjamin  | Triggiani |   27 | btriggiani | biking, running, gaming, watching tv, studying |
+ * +---------+-----------+-----------+------+------------+------------------------------------------------+
  * 
  * Sample people table:
- * +---------+------------+-----------+------+
- * | user_id | first_name | last_name | age  |
- * +---------+------------+-----------+------+
- * |       1 | Benjamin   | Triggiani |   27 |
- * +---------+------------+-----------+------+
+ * +---------+------------+-----------+------+------------+
+ * | user_id | first_name | last_name | age  | owner      |
+ * +---------+------------+-----------+------+------------+
+ * |       1 | Benjamin   | Triggiani |   27 | btriggiani |
+ * +---------+------------+-----------+------+------------+
  * 
  * Sample hobbies table
  * +----------+-------------+
@@ -81,17 +81,17 @@ public class UserRepository {
      * @param id the ID of the user
      * @return an optional user, is not empty when user has been found
      */
-    public Optional<People> getUserById(Long id){
+    public Optional<People> getUserById(Long id, String owner){
         //created view in database for easy execution
         String sql = """
-                SELECT user_Id, firstName, lastName, age, hobbies
+                SELECT user_Id, firstName, lastName, age, hobbies, owner
                 FROM user_with_hobbies
-                WHERE user_Id = ?
+                WHERE user_Id = ? AND owner = ?;
                 """;
         try{
         People user = jdbcTemplate.queryForObject(sql, (rs, row) -> {
-            return new People(rs.getLong(1), rs.getString(2), rs.getString(3), rs.getInt(4), rs.getString(5));
-        }, id);
+            return new People(rs.getLong(1), rs.getString(2), rs.getString(3), rs.getInt(4), rs.getString(5), rs.getString(6));
+        }, id, owner);
         return Optional.of(user);
         }catch(EmptyResultDataAccessException e){
             return Optional.empty();
@@ -107,8 +107,8 @@ public class UserRepository {
     public Long createUser(People user){
         try{
             String insertUserSql = """
-                INSERT INTO people(first_name, last_name, age)
-                VALUES(?, ?, ?);
+                INSERT INTO people(first_name, last_name, age, owner)
+                VALUES(?, ?, ?, ?);
                 """;            
             KeyHolder userKeyHolder = new GeneratedKeyHolder();
             jdbcTemplate.update(connection -> {
@@ -116,6 +116,7 @@ public class UserRepository {
                 ps.setString(1, user.firstName());
                 ps.setString(2, user.lastName());
                 ps.setInt(3, user.age());
+                ps.setString(4, user.owner());
                 return ps;
             }, userKeyHolder);
 
@@ -153,8 +154,8 @@ public class UserRepository {
     public Long createUserIdOverride(People user){
         try{
             String insertUserSql = """
-                INSERT INTO people(user_id, first_name, last_name, age)
-                VALUES(?, ?, ?, ?);
+                INSERT INTO people(user_id, first_name, last_name, age, owner)
+                VALUES(?, ?, ?, ?, ?);
                 """;         
             KeyHolder userKeyHolder = new GeneratedKeyHolder();
             jdbcTemplate.update(connection -> {
@@ -163,6 +164,7 @@ public class UserRepository {
                 ps.setString(2, user.firstName());
                 ps.setString(3, user.lastName());
                 ps.setInt(4, user.age());
+                ps.setString(5, user.owner());
                 return ps;
             }, userKeyHolder);
 
@@ -198,15 +200,16 @@ public class UserRepository {
      * @return the number of rows modified
      */
     @Transactional
-    public int removeUserWithId(Long id){
+    public int removeUserWithId(Long id, String owner){
         String userSql = """
                 DELETE FROM people 
-                WHERE user_id = ?;
+                WHERE user_id = ? AND owner = ?;
                 """;
         
         //made decision to not delete the predefined hobbies because other users might later have them
-        userHobbyAssociationRepository.deleteAssociationWith(id);
-        int userRow = jdbcTemplate.update(userSql, id);
+        int userRow = jdbcTemplate.update(userSql, id, owner);
+        if(userRow > 0)
+            userHobbyAssociationRepository.deleteAssociationWith(id);
         
         return userRow;
     }
@@ -218,8 +221,9 @@ public class UserRepository {
      */
     public void updateUser(People user){
 
-        removeUserWithId(user.userId());
-
+        int rowmod = removeUserWithId(user.userId(), user.owner());
+        if(rowmod == 0)
+            throw new RuntimeException();
         createUserIdOverride(user);
     }
 }

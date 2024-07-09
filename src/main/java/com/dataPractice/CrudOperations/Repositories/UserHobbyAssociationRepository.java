@@ -1,4 +1,4 @@
-package com.dataPractice.CrudOperations.Repository;
+package com.dataPractice.CrudOperations.Repositories;
 
 import org.springframework.jdbc.core.JdbcTemplate;
 import org.springframework.stereotype.Repository;
@@ -9,18 +9,18 @@ import org.springframework.stereotype.Repository;
  * created to manage this relationship.
  * 
  * Sample user_with_hobbies view:
- * +--------+-----------+-----------+------+------------------------------------------------+
- * | userId | firstName | lastName  | age  | hobbies                                        |
- * +--------+-----------+-----------+------+------------------------------------------------+
- * |      1 | Benjamin  | Triggiani |   27 | biking, running, gaming, watching tv, studying |
- * +--------+-----------+-----------+------+------------------------------------------------+
+ * +---------+-----------+-----------+------+------------+------------------------------------------------+
+ * | user_id | FirstName | LastName  | Age  | Owner      | hobbies                                        |
+ * +---------+-----------+-----------+------+------------+------------------------------------------------+
+ * |       1 | Benjamin  | Triggiani |   27 | btriggiani | biking, running, gaming, watching tv, studying |
+ * +---------+-----------+-----------+------+------------+------------------------------------------------+
  * 
- * Sample users table:
- * +---------+------------+-----------+------+
- * | user_id | first_name | last_name | age  |
- * +---------+------------+-----------+------+
- * |       1 | Benjamin   | Triggiani |   27 |
- * +---------+------------+-----------+------+
+ * Sample people table:
+ * +---------+------------+-----------+------+------------+
+ * | user_id | first_name | last_name | age  | owner      |
+ * +---------+------------+-----------+------+------------+
+ * |       1 | Benjamin   | Triggiani |   27 | btriggiani |
+ * +---------+------------+-----------+------+------------+
  * 
  * Sample hobbies table
  * +----------+-------------+

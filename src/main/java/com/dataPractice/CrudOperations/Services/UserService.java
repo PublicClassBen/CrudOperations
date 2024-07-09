@@ -1,11 +1,11 @@
-package com.dataPractice.CrudOperations.Service;
+package com.dataPractice.CrudOperations.Services;
 
 import java.util.Optional;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
 import com.dataPractice.CrudOperations.Entities.People;
-import com.dataPractice.CrudOperations.Repository.UserRepository;
+import com.dataPractice.CrudOperations.Repositories.UserRepository;
 /**
  * Service component for managing Users.
  * Any business logic for users should be done in this layer.
@@ -30,8 +30,8 @@ public class UserService {
      * @param id the ID of the user requested
      * @return the User from the database
      */
-    public People getUserById(Long id){
-        Optional<People> oUser = userRepository.getUserById(id);
+    public People getUserById(Long id, String owner){
+        Optional<People> oUser = userRepository.getUserById(id, owner);
 
         return oUser.isPresent()? oUser.get(): null;
     }
@@ -53,8 +53,8 @@ public class UserService {
      * @param userId the ID of the user to be deleted
      */
     @Transactional
-    public void deleteUserById(Long userId){
-        int rowsModified = userRepository.removeUserWithId(userId);
+    public void deleteUserById(Long userId, String owner){
+        int rowsModified = userRepository.removeUserWithId(userId, owner);
         if(rowsModified == 0)
             throw new RuntimeException("Attempting to Delete a user that does not exist with ID: " + userId + " Trace: ");
     }

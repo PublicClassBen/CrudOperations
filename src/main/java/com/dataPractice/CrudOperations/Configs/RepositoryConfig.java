@@ -1,4 +1,4 @@
-package com.dataPractice.CrudOperations.config;
+package com.dataPractice.CrudOperations.Configs;
 
 import javax.sql.DataSource;
 

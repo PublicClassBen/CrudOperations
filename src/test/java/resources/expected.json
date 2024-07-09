@@ -3,5 +3,6 @@
     "firstName": "Benjamin",
     "lastName": "Triggiani",
     "age": 27,
-    "hobbies": "biking, running, gaming, watching tv, studying"
+    "hobbies": "biking, running, gaming, watching tv, studying",
+    "owner": "btriggiani"
 }

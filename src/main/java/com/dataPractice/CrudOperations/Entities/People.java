@@ -4,6 +4,6 @@ package com.dataPractice.CrudOperations.Entities;
  * 
  * @author Benjamin Triggiani
  */
-public record People(Long userId, String firstName, String lastName, int age, String hobbies) {
+public record People(Long userId, String firstName, String lastName, int age, String hobbies, String owner) {
 
 }

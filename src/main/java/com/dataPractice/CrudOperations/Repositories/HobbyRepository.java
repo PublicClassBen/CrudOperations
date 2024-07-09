@@ -1,4 +1,4 @@
-package com.dataPractice.CrudOperations.Repository;
+package com.dataPractice.CrudOperations.Repositories;
 
 import java.sql.PreparedStatement;
 import java.sql.Statement;
@@ -10,19 +10,19 @@ import org.springframework.stereotype.Repository;
 /**
  * Repository component for persistenly managing hobbies.
  * 
- *  Sample user_with_hobbies view:
- * +--------+-----------+-----------+------+------------------------------------------------+
- * | userId | firstName | lastName  | age  | hobbies                                        |
- * +--------+-----------+-----------+------+------------------------------------------------+
- * |      1 | Benjamin  | Triggiani |   27 | biking, running, gaming, watching tv, studying |
- * +--------+-----------+-----------+------+------------------------------------------------+
+ * Sample user_with_hobbies view:
+ * +---------+-----------+-----------+------+------------+------------------------------------------------+
+ * | user_id | FirstName | LastName  | Age  | Owner      | hobbies                                        |
+ * +---------+-----------+-----------+------+------------+------------------------------------------------+
+ * |       1 | Benjamin  | Triggiani |   27 | btriggiani | biking, running, gaming, watching tv, studying |
+ * +---------+-----------+-----------+------+------------+------------------------------------------------+
  * 
- * Sample users table:
- * +---------+------------+-----------+------+
- * | user_id | first_name | last_name | age  |
- * +---------+------------+-----------+------+
- * |       1 | Benjamin   | Triggiani |   27 |
- * +---------+------------+-----------+------+
+ * Sample people table:
+ * +---------+------------+-----------+------+------------+
+ * | user_id | first_name | last_name | age  | owner      |
+ * +---------+------------+-----------+------+------------+
+ * |       1 | Benjamin   | Triggiani |   27 | btriggiani |
+ * +---------+------------+-----------+------+------------+
  * 
  * Sample hobbies table
  * +----------+-------------+

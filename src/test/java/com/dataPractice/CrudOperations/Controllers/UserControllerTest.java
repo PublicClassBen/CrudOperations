@@ -23,7 +23,9 @@ public class UserControllerTest {
 
     @Test
     void shouldReturnAUserWithHobbies(){
-        ResponseEntity<String> response = restTemplate.getForEntity("/user?userId=1", String.class);
+        ResponseEntity<String> response = restTemplate
+        .withBasicAuth("btriggiani", "notAPassword!")
+        .getForEntity("/user?userId=1", String.class);
 
         assertThat(response.getStatusCode()).isEqualTo(HttpStatus.OK);
 
@@ -44,50 +46,71 @@ public class UserControllerTest {
         String hobbies = dc.read("$.hobbies");
         assertThat(hobbies).isEqualTo("biking, running, gaming, watching tv, studying");
         
+        String owner = dc.read("$.owner");
+        assertThat(owner).isEqualTo("btriggiani");
     }
 
     @Test
     void shouldReturnNotFoundWhenRequestingAUserThatDoesntExists(){
-        ResponseEntity<String> response = restTemplate.getForEntity("/user?userId=999999", String.class);
+        ResponseEntity<String> response = restTemplate
+        .withBasicAuth("btriggiani", "notAPassword!")
+        .getForEntity("/user?userId=999999", String.class);
         assertThat(response.getStatusCode()).isEqualTo(HttpStatus.NOT_FOUND);
 
     }
 
     @Test
     void shouldAddUserAndAllHobbies(){
-        People user = new People(null, "Thomas", "Triggiani", 25, "anime, gaming, legos");
-        ResponseEntity<Void> response = restTemplate.postForEntity("/user", user, Void.class);
+        People user = new People(null, "Thomas", "Triggiani", 25, "anime, gaming, legos", null);
+        ResponseEntity<Void> response = restTemplate
+        .withBasicAuth("btriggiani", "notAPassword!")
+        .postForEntity("/user", user, Void.class);
         
         assertThat(response.getStatusCode()).isEqualTo(HttpStatus.NO_CONTENT);
-        ResponseEntity<String> getResponse = restTemplate.getForEntity(response.getHeaders().getLocation(), String.class);
+        ResponseEntity<String> getResponse = restTemplate
+        .withBasicAuth("btriggiani", "notAPassword!")
+        .getForEntity(response.getHeaders().getLocation(), String.class);
         assertThat(getResponse.getStatusCode()).isEqualTo(HttpStatus.OK);
-        restTemplate.delete(response.getHeaders().getLocation());
+        ResponseEntity<Void> deleteResponse = restTemplate
+        .withBasicAuth("btriggiani", "notAPassword!")
+        .exchange(response.getHeaders().getLocation(), HttpMethod.DELETE, null, Void.class);
+        assertThat(deleteResponse.getStatusCode()).isEqualTo(HttpStatus.NO_CONTENT);
     }
 
     @Test
     void shouldDeleteAUser(){
-        People user = new People(null, "Thomas", "Triggiani", 25, "anime, gaming, legos");
-        ResponseEntity<Void> response = restTemplate.postForEntity("/user", user, Void.class);
+        People user = new People(null, "Thomas", "Triggiani", 25, "anime, gaming, legos", "btriggiani");
+        ResponseEntity<Void> response = restTemplate
+        .withBasicAuth("btriggiani", "notAPassword!")
+        .postForEntity("/user", user, Void.class);
 
-        ResponseEntity<Void> deleteResponse = restTemplate.exchange(response.getHeaders().getLocation(), HttpMethod.DELETE, null, Void.class);
+        ResponseEntity<Void> deleteResponse = restTemplate
+        .withBasicAuth("btriggiani", "notAPassword!")
+        .exchange(response.getHeaders().getLocation(), HttpMethod.DELETE, null, Void.class);
         assertThat(deleteResponse.getStatusCode()).isEqualTo(HttpStatus.NO_CONTENT);
     }
 
     @Test
     void returnNotFoundWhenDeletingUserThatDoesNotExist(){
-        ResponseEntity<Void> response = restTemplate.exchange("/user?userId=999999", HttpMethod.DELETE, null, Void.class);
+        ResponseEntity<Void> response = restTemplate
+        .withBasicAuth("btriggiani", "notAPassword!")
+        .exchange("/user?userId=999999", HttpMethod.DELETE, null, Void.class);
         assertThat(response.getStatusCode()).isEqualTo(HttpStatus.NOT_FOUND);
     }
 
     @Test
     void shouldUpdateExistingUser(){
-        People user = new People(1L, "Benjamin", "Triggiani", 28, "biking, running, gaming, watching tv, studying");
+        People user = new People(1L, "Benjamin", "Triggiani", 28, "biking, running, gaming, watching tv, studying", null);
         HttpEntity<People> httpEntity = new HttpEntity<>(user);
-        ResponseEntity<Void> response = restTemplate.exchange("/user", HttpMethod.PUT, httpEntity,Void.class);
+        ResponseEntity<Void> response = restTemplate
+        .withBasicAuth("btriggiani", "notAPassword!")
+        .exchange("/user", HttpMethod.PUT, httpEntity,Void.class);
 
         assertThat(response.getStatusCode()).isEqualTo(HttpStatus.NO_CONTENT);
 
-        ResponseEntity<String> getResponse = restTemplate.getForEntity("/user?userId=1", String.class);
+        ResponseEntity<String> getResponse = restTemplate
+        .withBasicAuth("btriggiani", "notAPassword!")
+        .getForEntity("/user?userId=1", String.class);
 
         assertThat(getResponse.getStatusCode()).isEqualTo(HttpStatus.OK);
 
@@ -95,10 +118,58 @@ public class UserControllerTest {
         Number age = dc.read("$.age");
         assertThat(age).isEqualTo(28);
 
-        user = new People(1L, "Benjamin", "Triggiani", 27, "biking, running, gaming, watching tv, studying");
+        user = new People(1L, "Benjamin", "Triggiani", 27, "biking, running, gaming, watching tv, studying", null);
         httpEntity = new HttpEntity<>(user);
-        response = restTemplate.exchange("/user", HttpMethod.PUT, httpEntity,Void.class);
+        response = restTemplate
+        .withBasicAuth("btriggiani", "notAPassword!")  
+        .exchange("/user", HttpMethod.PUT, httpEntity,Void.class);
 
+    }
+
+    @Test
+    void shouldReturnUnauthorizedIfPasswordIsIncorrect(){
+        ResponseEntity<String> response = restTemplate
+        .withBasicAuth("btriggiani", "BAD_PASSWORD")
+        .getForEntity("/user?userId=1", String.class);
+
+        assertThat(response.getStatusCode()).isEqualTo(HttpStatus.UNAUTHORIZED);
+    }
+
+    @Test
+    void shouldReturnUnauthorizedIfUsernameIsIncorrect(){
+        ResponseEntity<String> response = restTemplate
+        .withBasicAuth("BAD_USERNAME", "notAPassword!")
+        .getForEntity("/user?userId=1", String.class);
+
+        assertThat(response.getStatusCode()).isEqualTo(HttpStatus.UNAUTHORIZED);
+    }
+
+    @Test
+    void shouldNotBeAbleToAccessUsersTheyDoNotOwn(){
+        ResponseEntity<String> response = restTemplate
+        .withBasicAuth("atriggiani", "notAPassword!")
+        .getForEntity("/user?userId=1", String.class);
+
+        assertThat(response.getStatusCode()).isEqualTo(HttpStatus.NOT_FOUND);
+    }
+
+    @Test
+    void shouldNotBeAbleToUpdateUsersTheyDoNotOwn(){
+        People user = new People(1L, "Benjamin", "Triggiani", 27, "biking, running, gaming, watching tv, studying", null);
+        HttpEntity<People> httpEntity = new HttpEntity<>(user);
+        ResponseEntity<Void> response = restTemplate
+        .withBasicAuth("atriggiani", "notAPassword!")  
+        .exchange("/user", HttpMethod.PUT, httpEntity,Void.class);
+        assertThat(response.getStatusCode()).isEqualTo(HttpStatus.NOT_FOUND);
+    }
+
+    @Test
+    void shouldNotBeAbleToDeleteUsersTheyDoNotOwn(){
+        ResponseEntity<Void> response = restTemplate
+        .withBasicAuth("atriggiani", "notAPassword!")
+        .exchange("/user?userId=1", HttpMethod.DELETE, null, Void.class);
+
+        assertThat(response.getStatusCode()).isEqualTo(HttpStatus.NOT_FOUND);
     }
 
 }

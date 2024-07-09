@@ -6,9 +6,6 @@ import org.springframework.boot.test.autoconfigure.json.JsonTest;
 import org.springframework.boot.test.json.JacksonTester;
 
 import com.dataPractice.CrudOperations.Entities.People;
-import com.jayway.jsonpath.DocumentContext;
-import com.jayway.jsonpath.JsonPath;
-
 import static org.assertj.core.api.Assertions.assertThat;
 
 import java.io.IOException;
@@ -21,7 +18,7 @@ public class JsonTests {
 
     @Test
     void userJsonSerializationTest() throws IOException{
-        People user = new People(1L, "Benjamin", "Triggiani", 27, "biking, running, gaming, watching tv, studying");
+        People user = new People(1L, "Benjamin", "Triggiani", 27, "biking, running, gaming, watching tv, studying", "btriggiani");
         assertThat(json.write(user)).isStrictlyEqualToJson("/resources/expected.json");
         assertThat(json.write(user)).hasJsonPathNumberValue("@.userId");
         assertThat(json.write(user)).extractingJsonPathNumberValue("@.userId").isEqualTo(1);
@@ -33,6 +30,8 @@ public class JsonTests {
         assertThat(json.write(user)).extractingJsonPathNumberValue("@.age").isEqualTo(27);
         assertThat(json.write(user)).hasJsonPathStringValue("@.hobbies");
         assertThat(json.write(user)).extractingJsonPathStringValue("@.hobbies").isEqualTo("biking, running, gaming, watching tv, studying");
+        assertThat(json.write(user)).hasJsonPathStringValue("@.owner");
+        assertThat(json.write(user)).extractingJsonPathStringValue("@.owner").isEqualTo("btriggiani");
     }
 
     @Test
@@ -43,9 +42,10 @@ public class JsonTests {
                     "firstName": "Benjamin",
                     "lastName": "Triggiani",
                     "age": 27,
-                    "hobbies": "biking, running, gaming, watching tv, studying"
+                    "hobbies": "biking, running, gaming, watching tv, studying",
+                    "owner": "btriggiani"
                 }""";
 
-        assertThat(json.parse(expected)).isEqualTo(new People(1L, "Benjamin", "Triggiani", 27, "biking, running, gaming, watching tv, studying"));
+        assertThat(json.parse(expected)).isEqualTo(new People(1L, "Benjamin", "Triggiani", 27, "biking, running, gaming, watching tv, studying", "btriggiani"));
     }
 }
